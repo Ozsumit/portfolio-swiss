@@ -115,7 +115,7 @@ const App: React.FC = () => {
       </main>
 
       <Footer onNavigate={setCurrentView} />
-      <ChatWidget />
+      {/* <ChatWidget /> */}
 
       {/* RENDER THE MODAL HERE */}
       <ContactModal
