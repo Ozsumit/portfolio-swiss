@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-// ... keep your existing imports
+import React, { useState, useEffect } from "react";
 import Navbar from "./components/Navbar";
 import Hero from "./components/Hero";
 import WorkGrid from "./components/WorkGrid";
@@ -8,21 +7,48 @@ import Experience from "./components/Experience";
 import About from "./components/About";
 import Philosophy from "./components/Philosophy";
 import Footer from "./components/Footer";
-import ChatWidget from "./components/ChatWidget";
 import ProjectDetail from "./components/ProjectDetail";
 import Gallery from "./components/Gallery";
 import Dashboard from "./components/Dashboard";
-import { SectionId, Project, ViewState } from "./types";
-
-// IMPORT THE NEW MODAL
 import ContactModal from "./components/ContactModal";
 
+// Import types and supabase client
+import { SectionId, Project, ViewState } from "./types";
+import { supabase } from "./lib/supabase"; // Ensure you created this file
+
 const App: React.FC = () => {
+  // State for Projects (fetched from Supabase)
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  // Existing State
   const [activeProject, setActiveProject] = useState<Project | null>(null);
   const [currentView, setCurrentView] = useState<ViewState>("home");
-
-  // NEW STATE FOR MODAL VISIBILITY
   const [isContactOpen, setIsContactOpen] = useState(false);
+
+  // Fetch Projects from Supabase on Mount
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const { data, error } = await supabase
+          .from("projects")
+          .select("*")
+          .order("id", { ascending: true }); // Or order by 'year'
+
+        if (error) throw error;
+
+        if (data) {
+          setProjects(data as Project[]);
+        }
+      } catch (error) {
+        console.error("Error fetching projects:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProjects();
+  }, []);
 
   const handleProjectClick = (project: Project) => {
     setActiveProject(project);
@@ -33,15 +59,23 @@ const App: React.FC = () => {
     setActiveProject(null);
   };
 
+  // Logic to handle "Next Project" navigation inside Project Detail
+  const handleNextProject = (current: Project) => {
+    const currentIndex = projects.findIndex((p) => p.id === current.id);
+    const nextIndex = (currentIndex + 1) % projects.length;
+    const nextProject = projects[nextIndex];
+    handleProjectClick(nextProject);
+  };
+
   if (activeProject) {
     return (
       <div className="min-h-screen bg-m3-surface text-m3-on-surface font-sans selection:bg-swiss-red selection:text-white">
         <ProjectDetail
           project={activeProject}
           onBack={handleBack}
-          onNext={handleProjectClick}
+          onNext={() => handleNextProject(activeProject)}
         />
-        <ChatWidget />
+        {/* <ChatWidget /> */}
       </div>
     );
   }
@@ -53,14 +87,18 @@ const App: React.FC = () => {
       <main className="w-full">
         {currentView === "home" && (
           <>
-            {/* ... other sections remain the same ... */}
             <section id={SectionId.HERO}>
               <Hero />
             </section>
 
             <div className="w-full max-w-[96vw] mx-auto px-4 md:px-0 space-y-20 md:space-y-32 pb-20 pt-10">
               <section id={SectionId.WORK}>
-                <WorkGrid onProjectClick={handleProjectClick} />
+                {/* Pass fetched data to WorkGrid */}
+                <WorkGrid
+                  projects={projects}
+                  loading={loading}
+                  onProjectClick={handleProjectClick}
+                />
               </section>
 
               <Philosophy />
@@ -91,7 +129,6 @@ const App: React.FC = () => {
                     COLLABORATE
                   </h2>
 
-                  {/* CHANGED: Replaced <a> with <button> and onClick handler */}
                   <button
                     onClick={() => setIsContactOpen(true)}
                     className="group relative z-10 inline-flex items-center justify-center h-20 md:h-24 px-12 md:px-20 rounded-full bg-m3-on-secondary-container text-m3-secondary-container text-xl md:text-2xl font-bold overflow-hidden shadow-2xl hover:scale-105 transition-all duration-300"
@@ -115,9 +152,7 @@ const App: React.FC = () => {
       </main>
 
       <Footer onNavigate={setCurrentView} />
-      {/* <ChatWidget /> */}
 
-      {/* RENDER THE MODAL HERE */}
       <ContactModal
         isOpen={isContactOpen}
         onClose={() => setIsContactOpen(false)}

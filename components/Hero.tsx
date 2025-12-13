@@ -196,14 +196,14 @@ const Hero: React.FC = () => {
         {/* Top Meta Data */}
         <div className="flex justify-between items-end mb-12 md:mb-24 opacity-0 animate-[fadeIn_0.8s_ease-out_0.2s_forwards]">
           <div className="font-mono text-xs md:text-sm tracking-widest text-m3-secondary uppercase">
-            Code × Design
+            Comsic × Wndr
             <br />
-            (Est. 2023)
+            (Est. 2025)
           </div>
           <div className="font-mono text-xs md:text-sm tracking-widest text-m3-secondary uppercase text-right">
             Frontend
             <br />
-            Available
+            Designer
             <br />
           </div>
         </div>
@@ -228,8 +228,8 @@ const Hero: React.FC = () => {
                 src="/logos.svg"
                 alt="alt"
                 className="ml-4 inline-block"
-                width={150}
-                height={150}
+                width={180}
+                height={180}
               />
 
               {/* Hover Fill Effect */}

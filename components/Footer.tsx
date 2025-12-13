@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { SectionId, ViewState } from "../types";
 
 interface FooterProps {
@@ -6,6 +6,58 @@ interface FooterProps {
 }
 
 const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+  const [showAdmin, setShowAdmin] = useState(false);
+
+  // Ref to track tap timeout for mobile
+  const tapTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const [tapCount, setTapCount] = useState(0);
+
+  // 1. DESKTOP: Listen for typing "admin"
+  useEffect(() => {
+    let keyBuffer = "";
+    const secretCode = "admin";
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      keyBuffer += e.key;
+      if (keyBuffer.length > secretCode.length) {
+        keyBuffer = keyBuffer.slice(-secretCode.length);
+      }
+      if (keyBuffer.toLowerCase() === secretCode) {
+        setShowAdmin(true);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
+  // 2. MOBILE: Logic for "5 Taps" secret
+  const handleSecretTap = () => {
+    // Increment tap count
+    setTapCount((prev) => {
+      const newCount = prev + 1;
+
+      // If 5 taps reached, unlock admin
+      if (newCount >= 5) {
+        setShowAdmin(true);
+        // Optional: Vibrate phone to indicate success
+        if (navigator.vibrate) navigator.vibrate(200);
+        return 0; // Reset
+      }
+      return newCount;
+    });
+
+    // Clear existing timer to reset count if user stops tapping
+    if (tapTimeoutRef.current) {
+      clearTimeout(tapTimeoutRef.current);
+    }
+
+    // Reset tap count if no tap occurs within 1 second
+    tapTimeoutRef.current = setTimeout(() => {
+      setTapCount(0);
+    }, 1000);
+  };
+
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
@@ -18,6 +70,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-m3-surface-variant/50 mb-8">
               Get in touch
             </h3>
+            {/* ... Social Links ... */}
             <div className="flex flex-col gap-2 items-start">
               <a
                 href="mailto:sumit@example.com"
@@ -47,6 +100,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   Menu
                 </span>
                 <ul className="space-y-4">
+                  {/* ... Menu Items ... */}
                   <li>
                     <button
                       onClick={() => {
@@ -75,9 +129,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   </li>
                   <li>
                     <button
-                      onClick={() => {
-                        onNavigate("gallery");
-                      }}
+                      onClick={() => onNavigate("gallery")}
                       className="text-xl font-bold hover:text-swiss-red transition-colors text-m3-surface hover:translate-x-2 inline-block duration-300"
                     >
                       Gallery
@@ -85,8 +137,17 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                   </li>
                 </ul>
               </div>
+
               <div>
-                <span className="block text-xs font-bold text-m3-secondary mb-6 uppercase tracking-[0.2em]">
+                {/* 
+                   MOBILE TRIGGER: 
+                   Added onClick to this span. 
+                   Tapping "LEGAL" 5 times reveals the button. 
+                */}
+                <span
+                  onClick={handleSecretTap}
+                  className="block text-xs font-bold text-m3-secondary mb-6 uppercase tracking-[0.2em] select-none cursor-pointer active:text-white transition-colors"
+                >
                   Legal
                 </span>
                 <ul className="space-y-4">
@@ -98,17 +159,21 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
                       Privacy
                     </a>
                   </li>
-                  <li>
-                    {/* <button
-                      onClick={() => onNavigate("dashboard")}
-                      className="text-xl font-bold hover:text-swiss-red transition-colors text-m3-surface hover:translate-x-2 inline-block duration-300"
-                    >
-                      Admin
-                    </button> */}
-                  </li>
+
+                  {showAdmin && (
+                    <li className="animate-fade-in">
+                      <button
+                        onClick={() => onNavigate("dashboard")}
+                        className="text-xl font-bold text-swiss-red hover:text-white transition-colors hover:translate-x-2 inline-block duration-300"
+                      >
+                        Admin
+                      </button>
+                    </li>
+                  )}
                 </ul>
               </div>
             </div>
+
             <div className="mt-12 text-right">
               <button
                 onClick={scrollToTop}
@@ -125,14 +190,7 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
 
         <div className="border-t border-white/10 pt-8">
           <h2 className="text-[14vw] font-black leading-none tracking-tighter text-m3-surface/5 select-none text-center pointer-events-none">
-            {/* <img
-              src="/vass-logo.svg"
-              alt="alt"
-              className="ml-4 inline-block"
-              width={200}
-              height={100}
-            />{" "} */}
-            SUMIT
+            SUMIT_POKHREL
           </h2>
           <div className="flex flex-col md:flex-row justify-between mt-8 text-xs text-m3-surface-variant font-mono uppercase tracking-wider">
             <span>© 2024 Sumit Pokhrel</span>
