@@ -425,30 +425,63 @@ function ProjectFormModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
+
     try {
       let imageUrl = project?.image;
 
+      // --- 1. Handle Image Upload ---
       if (imageFile) {
         const parts = imageFile.name.split(".");
         const ext = parts.pop();
         const fileName = `${Date.now()}-${parts
           .join("")
           .replace(/[^a-z0-9]/gi, "")}.${ext}`;
-        const { error } = await supabase.storage
+
+        const { error: uploadError } = await supabase.storage
           .from("portfolio")
           .upload(fileName, imageFile);
-        if (error) throw error;
+
+        if (uploadError) throw uploadError;
+
         const { data } = supabase.storage
           .from("portfolio")
           .getPublicUrl(fileName);
         imageUrl = data.publicUrl;
       }
 
-      const payload = { ...formData, tags, image: imageUrl };
+      // --- 2. Prepare Payload ---
+      // Ensure numeric types are actually numbers if your DB expects Int
+      const payload = {
+        ...formData,
+        tags,
+        image: imageUrl,
+        // Optional: Convert year to number if DB column is int
+        // year: parseInt(formData.year)
+      };
 
-      if (project?.id)
-        await supabase.from("projects").update(payload).eq("id", project.id);
-      else await supabase.from("projects").insert([payload]);
+      // --- 3. Database Operation with Error Checking ---
+      let result;
+
+      if (project?.id) {
+        // Update existing
+        result = await supabase
+          .from("projects")
+          .update(payload)
+          .eq("id", project.id);
+      } else {
+        // Create new
+        result = await supabase.from("projects").insert([payload]);
+      }
+
+      // CRITICAL FIX: Check for Supabase error
+      if (result.error) {
+        console.error(
+          "Supabase Error:",
+          result.error.message,
+          result.error.details
+        );
+        throw result.error;
+      }
 
       addToast(
         project
@@ -456,11 +489,13 @@ function ProjectFormModal({
           : "Project created successfully",
         "success"
       );
+
       onRefresh();
       onClose();
-    } catch (e) {
-      console.error(e);
-      addToast("Error saving project", "error");
+    } catch (error: any) {
+      console.error("Submission failed:", error);
+      // Show the actual error message from Supabase in the toast
+      addToast(error.message || "Error saving project", "error");
     } finally {
       setLoading(false);
     }

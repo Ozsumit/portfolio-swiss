@@ -1,0 +1,27 @@
+:root {
+  /* ===== Material You 3 Expressive (Light) ===== */
+
+  --m3-primary: #6750a4; /* expressive violet */
+  --m3-on-primary: #ffffff;
+
+  --m3-secondary: #625b71;
+  --m3-on-secondary: #ffffff;
+
+  --m3-tertiary: #7d5260; /* emotional accent */
+  --m3-on-tertiary: #ffffff;
+
+  --m3-error: #b3261e;
+
+  --m3-surface: #fffbfe;
+  --m3-surface-variant: #e7e0ec;
+  --m3-on-surface: #1c1b1f;
+  --m3-on-surface-variant: #49454f;
+
+  /* Expressive elevations */
+  --m3-outline: #79747e;
+  --m3-outline-variant: #cac4d0;
+
+  /* Accent */
+  --m3-primary-container: #eaddff;
+  --m3-on-primary-container: #21005d;
+}

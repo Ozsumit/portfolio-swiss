@@ -70,7 +70,7 @@ const Hero: React.FC = () => {
       // Optimization: Batch style changes if possible, though here we change color per particle
       // We can use a single path for dormant particles to reduce draw calls
 
-      ctx.fillStyle = "#E7E0EC"; // m3-surface-variant (light)
+      ctx.fillStyle = "#9500ffff"; // m3-surface-variant (light)
       ctx.beginPath();
 
       // First pass: Calculate physics and gather dormant points
@@ -227,7 +227,7 @@ const Hero: React.FC = () => {
               <img
                 src="/logos.svg"
                 alt="alt"
-                className="ml-4 inline-block"
+                className="ml-4 pointer-events-none inline-block"
                 width={180}
                 height={180}
               />
