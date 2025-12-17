@@ -73,19 +73,19 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             {/* ... Social Links ... */}
             <div className="flex flex-col gap-2 items-start">
               <a
-                href="mailto:sumit@example.com"
+                href="mailto:pokhrelsumit36@example.com"
                 className="text-3xl md:text-6xl font-black tracking-tighter text-m3-surface-variant hover:text-white hover:translate-x-4 transition-all duration-300"
               >
                 Email
               </a>
               <a
-                href="#"
+                href="https://www.instagram.com/sumitp._"
                 className="text-3xl md:text-6xl font-black tracking-tighter text-m3-surface-variant hover:text-white hover:translate-x-4 transition-all duration-300"
               >
-                linkedin
+                Instagram
               </a>
               <a
-                href="#"
+                href="https://github.com/ozsumit"
                 className="text-3xl md:text-6xl font-black tracking-tighter text-m3-surface-variant hover:text-white hover:translate-x-4 transition-all duration-300"
               >
                 github
