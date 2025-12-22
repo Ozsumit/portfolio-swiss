@@ -25,3 +25,32 @@
   --m3-primary-container: #eaddff;
   --m3-on-primary-container: #21005d;
 }
+@media (pointer: fine) {
+  /* Only apply on devices with a mouse (not touch) */
+  body,
+  a,
+  button,
+  input,
+  textarea,
+  [role="button"] {
+    cursor: none !important;
+  }
+}
+/* index.css or App.css */
+
+/* Hide default cursor on desktop */
+@media (pointer: fine) {
+  body,
+  a,
+  button,
+  input,
+  [role="button"] {
+    cursor: none !important;
+  }
+}
+
+/* Ensure the custom cursor is always on top */
+#root {
+  position: relative;
+  z-index: 1;
+}
